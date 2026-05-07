@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>待办事项</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>待办事项</h1>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="active">待完成</button>
+    <button class="filter-btn" data-filter="completed">已完成</button>
+    <select id="priority-filter">
+      <option value="all">所有优先级</option>
+      <option value="high">高</option>
+      <option value="medium">中</option>
+      <option value="low">低</option>
+    </select>
+    <select id="category-filter">
+      <option value="all">所有分类</option>
+      <option value="工作">工作</option>
+      <option value="个人">个人</option>
+      <option value="学习">学习</option>
+      <option value="其他">其他</option>
+    </select>
+  </div>
+
+  <div class="add-form" id="add-form">
+    <h3>添加新任务</h3>
+    <div class="form-row">
+      <input type="text" id="new-title" placeholder="任务标题 *" maxlength="200">
+      <input type="text" id="new-desc" placeholder="描述（可选）" maxlength="500">
+    </div>
+    <div class="form-row">
+      <select id="new-priority">
+        <option value="medium">中优先级</option>
+        <option value="high">高优先级</option>
+        <option value="low">低优先级</option>
+      </select>
+      <select id="new-category">
+        <option value="工作">工作</option>
+        <option value="个人">个人</option>
+        <option value="学习">学习</option>
+        <option value="其他">其他</option>
+      </select>
+      <input type="date" id="new-due-date">
+      <button id="add-btn">添加</button>
+    </div>
+  </div>
+
+  <ul class="task-list" id="task-list"></ul>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
