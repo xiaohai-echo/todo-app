@@ -6,7 +6,7 @@
 
 - 任务的添加、查看、完成、删除
 - 优先级标记（高/中/低），左侧色条 + 标签区分
-- 分类管理（工作/个人/学习/其他）
+- 自定义分类管理（可动态增删，默认 4 个分类受保护）
 - 截止日期设置，超期红色提醒、3天内到期黄色提醒
 - 按状态、优先级、分类组合筛选
 - 完成统计面板（总数/已完成/待完成）
@@ -27,7 +27,8 @@ daily-report/
 ├── static/
 │   ├── style.css       # 样式
 │   └── app.js          # 前端逻辑
-├── tasks.json          # 数据文件（自动生成）
+├── tasks.json          # 任务数据（自动生成）
+├── categories.json     # 分类数据（自动生成）
 └── README.md
 ```
 
@@ -59,6 +60,9 @@ python app.py
 | POST   | /api/tasks        | 创建任务     |
 | PUT    | /api/tasks/\<id\> | 更新任务     |
 | DELETE | /api/tasks/\<id\> | 删除任务     |
+| GET    | /api/categories    | 获取分类列表 |
+| POST   | /api/categories    | 添加分类     |
+| DELETE | /api/categories/\<name\> | 删除分类 |
 
 ### 任务数据结构
 
