@@ -7,6 +7,24 @@ from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks.json")
+CATEGORY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "categories.json")
+
+DEFAULT_CATEGORIES = ["工作", "个人", "学习", "其他"]
+
+
+def load_categories():
+    if os.path.exists(CATEGORY_FILE):
+        with open(CATEGORY_FILE, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                pass
+    return list(DEFAULT_CATEGORIES)
+
+
+def save_categories(cats):
+    with open(CATEGORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(cats, f, ensure_ascii=False, indent=2)
 
 
 def load_tasks():
@@ -88,6 +106,37 @@ def delete_task(task_id):
     tasks = [t for t in tasks if t["id"] != task_id]
     save_tasks(tasks)
     return jsonify({"ok": True})
+
+
+@app.route("/api/categories", methods=["GET"])
+def get_categories():
+    return jsonify(load_categories())
+
+
+@app.route("/api/categories", methods=["POST"])
+def add_category():
+    data = request.get_json()
+    name = (data.get("name", "") if data else "").strip()
+    if not name:
+        return jsonify({"error": "分类名不能为空"}), 400
+    cats = load_categories()
+    if name in cats:
+        return jsonify({"error": "分类已存在"}), 409
+    cats.append(name)
+    save_categories(cats)
+    return jsonify(cats), 201
+
+
+@app.route("/api/categories/<name>", methods=["DELETE"])
+def delete_category(name):
+    cats = load_categories()
+    if name in DEFAULT_CATEGORIES:
+        return jsonify({"error": "不能删除默认分类"}), 403
+    if name not in cats:
+        return jsonify({"error": "分类不存在"}), 404
+    cats.remove(name)
+    save_categories(cats)
+    return jsonify(cats)
 
 
 if __name__ == "__main__":

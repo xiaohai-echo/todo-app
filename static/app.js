@@ -1,4 +1,5 @@
 let tasks = [];
+let categories = [];
 let currentFilter = "all";
 let currentPriority = "all";
 let currentCategory = "all";
@@ -7,6 +8,32 @@ async function fetchTasks() {
   const res = await fetch("/api/tasks");
   tasks = await res.json();
   render();
+}
+
+async function fetchCategories() {
+  const res = await fetch("/api/categories");
+  categories = await res.json();
+  populateCategoryDropdowns();
+}
+
+function populateCategoryDropdowns() {
+  const options = categories.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+
+  ["category-filter", "new-category"].forEach((id) => {
+    const sel = document.getElementById(id);
+    const val = sel.value;
+    if (id === "category-filter") {
+      sel.innerHTML = '<option value="all">所有分类</option>' + options;
+      sel.value = currentCategory;
+    } else {
+      sel.innerHTML = options;
+      sel.value = val;
+    }
+  });
+
+  document.getElementById("cat-tags").innerHTML = categories
+    .map((c) => `<span class="cat-tag">${esc(c)}<span class="cat-del" data-cat="${esc(c)}" title="删除">×</span></span>`)
+    .join("");
 }
 
 function render() {
@@ -54,7 +81,7 @@ function renderList() {
             ${dueHtml}
           </div>
         </div>
-        <button class="delete-btn" onclick="deleteTask('${t.id}')" title="删除">×</button>
+        <button class="delete-btn" onclick="deleteTask('${t.id}')" title="删除">&times;</button>
       </li>`;
   }).join("");
 }
@@ -90,11 +117,12 @@ async function addTask() {
   const title = document.getElementById("new-title").value.trim();
   if (!title) return alert("请输入任务标题");
 
+  const sel = document.getElementById("new-category");
   const body = {
     title,
     description: document.getElementById("new-desc").value,
     priority: document.getElementById("new-priority").value,
-    category: document.getElementById("new-category").value,
+    category: sel.value || categories[0] || "其他",
     due_date: document.getElementById("new-due-date").value,
   };
 
@@ -128,6 +156,35 @@ async function deleteTask(id) {
   await fetchTasks();
 }
 
+async function addCategory() {
+  const input = document.getElementById("new-cat-name");
+  const name = input.value.trim();
+  if (!name) return;
+  const res = await fetch("/api/categories", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (res.ok) {
+    input.value = "";
+    await fetchCategories();
+  } else {
+    const err = await res.json();
+    alert(err.error);
+  }
+}
+
+async function deleteCategory(name) {
+  const res = await fetch(`/api/categories/${encodeURIComponent(name)}`, { method: "DELETE" });
+  if (res.ok) {
+    if (currentCategory === name) currentCategory = "all";
+    await fetchCategories();
+  } else {
+    const err = await res.json();
+    alert(err.error);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".filter-btn").forEach((btn) => {
     btn.addEventListener("click", () => setFilter(btn.dataset.filter));
@@ -148,5 +205,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") addTask();
   });
 
+  document.getElementById("add-cat-btn").addEventListener("click", addCategory);
+  document.getElementById("new-cat-name").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addCategory();
+  });
+
+  document.getElementById("cat-tags").addEventListener("click", (e) => {
+    if (e.target.classList.contains("cat-del")) {
+      deleteCategory(e.target.dataset.cat);
+    }
+  });
+
+  fetchCategories();
   fetchTasks();
 });

@@ -25,10 +25,6 @@
     </select>
     <select id="category-filter">
       <option value="all">所有分类</option>
-      <option value="工作">工作</option>
-      <option value="个人">个人</option>
-      <option value="学习">学习</option>
-      <option value="其他">其他</option>
     </select>
   </div>
 
@@ -45,14 +41,19 @@
         <option value="low">低优先级</option>
       </select>
       <select id="new-category">
-        <option value="工作">工作</option>
-        <option value="个人">个人</option>
-        <option value="学习">学习</option>
-        <option value="其他">其他</option>
       </select>
       <input type="date" id="new-due-date">
       <button id="add-btn">添加</button>
     </div>
+  </div>
+
+  <div class="cat-manager">
+    <h3>分类管理</h3>
+    <div class="cat-controls">
+      <input type="text" id="new-cat-name" placeholder="新分类名称" maxlength="20">
+      <button id="add-cat-btn">添加分类</button>
+    </div>
+    <div class="cat-tags" id="cat-tags"></div>
   </div>
 
   <ul class="task-list" id="task-list"></ul>
